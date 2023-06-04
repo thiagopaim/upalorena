@@ -1,0 +1,173 @@
+---
+import '@fontsource-variable/josefin-sans'
+import Container from "./grid/container.astro"
+
+const prices = [
+  {
+    price: 10,
+    description: 'Com este valor você ajuda a dar banho em um cachorro',
+    link: 'http://pag.ae/blyZBJD'
+  },
+  {
+    price: 25,
+    description: 'Com este valor você ajuda a com a ração diária',
+    link: 'http://pag.ae/bgw94c6'
+  },
+  {
+    price: 50,
+    description: 'Com este valor você ajuda a com a ração semanal',
+    link: 'http://pag.ae/bgw93dJ'
+  },
+]
+---
+
+<Container>
+  <h1>Faça uma doação</h1>
+  <p>Ou saiba mais sobre outras formas de fazer uma doação. Clique aqui!</p>
+</Container>
+<section>
+  <div class="row">
+    {
+      prices.map((item) => (
+        <div class="column">
+          <h2 class="price">
+            <span class="coin">R$</span>
+            {item.price}
+            <div class="fraction">,00</div>
+          </h2>
+          <p class="description">{item.description}</p>
+          <a class="link" href={item.link} target="_blank" rel="nooppener nofollow">Doar valor</a>
+        </div>
+      ))
+    }
+    <div class="column">
+      <h2 class="price">
+        <span class="coin">R$</span>
+        <input class="customPrice" type="text" pattern="[0-9]*">
+        <div class="fraction">,00</div>
+      </h2>
+      <p class="description">Digite e faça uma doação no valor que desejar</p>
+      <a class="link" href="" target="_blank" rel="nooppener nofollow">Doar valor</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  section {
+    background-color: var(--color-prim);
+  }
+
+  .row {
+    display: flex;
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0px auto;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    padding: 60px 15px;
+  }
+
+  .price {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    line-height: 100%;
+    color: var(--color-back);
+    font-family: 'Josefin Sans Variable', sans-serif;
+
+    &:after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 1px;
+      bottom: 0px;
+      left: calc(50% - 15px);
+      opacity: 0.2;
+      background-color: var(--color-back);
+    }
+  }
+
+  .coin {
+    margin: 0px 5px 0px 0px;
+    font-size: 1rem;
+  }
+
+  .fraction {
+    margin: 0px 0px 0px 5px;
+    font-size: 1rem;
+  }
+
+  .description {
+    max-width: 200px;
+    margin: 0px auto 30px;
+    font-size: 0.875rem;
+    text-align: center;
+    opacity: 0.6;
+    color: var(--color-back);
+  }
+
+  .link {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    max-width: 180px;
+    padding: 15px;
+    margin: 0px auto;
+    border: 2px solid var(--color-comp);
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 100%;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    color: var(--color-comp);
+    transition: all 0.3s ease 0s;
+    user-select: none;
+
+    &:before {
+      content: "";
+      position: absolute;
+      top: -3px;
+      left: calc(50% - 3px);
+      opacity: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid var(--color-comp);
+      transition: all 0.1s ease 0s;
+    }
+
+    &:hover {
+      color: var(--color-prim);
+      background-color: var(--color-comp);
+
+      &:before {
+        opacity: 1;
+        top: -6px;
+      }
+    }
+  }
+
+  .customPrice {
+    appearance: none;
+    max-width: 160px;
+    height: 60px;
+    padding-top: 5px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    font-family: Josefin, sans-serif;
+    font-size: 4rem;
+    line-height: 100%;
+    text-align: center;
+    color: var(--color-back);
+    background-color: transparent;
+    transition: all 0.3s ease 0s;
+  }
+</style>

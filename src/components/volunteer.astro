@@ -1,0 +1,78 @@
+---
+import Container from "./grid/container.astro"
+---
+
+<section>
+  <Container>
+    <div class="column">
+      <h1>É um voluntáro vindo ali?</h1>
+      <p>
+        <strong>Precisamos de:</strong>
+      </p>
+      <ul>
+        <li>Veterinário</li>
+        <li>Banho e tosa</li>
+        <li>Campanhas de adoção</li>
+        <li>Transporte de animais</li>
+        <li>Campanha de ração e produtos de limpeza</li>
+        <li>Carona solidária</li>
+        <li>Lar temporário</li>
+      </ul>
+      <div class="contact">
+        <h3>
+          <span>Quer ser um voluntário?</span> Entre em contato!</h3>
+        <hr>
+        <p>E-mail: <a href="mailto:contato@upalorena.com.br">contato@upalorena.com.br</a></p>
+        <p>Telefone: <a href="tel:+5512997777499">(12) 9 9777 7499</a></p>
+      </div>
+    </div>
+  </Container>
+  <img class="image" src="/images/dog-watching.jpg" />
+</section>
+
+<style>
+  section {
+    position: relative;
+    background-color: var(--color-back-dark);
+  }
+
+  .row {
+    display: flex;
+    max-width: var(--max-width);
+    margin: 0px auto;
+    padding: 80px 15px;
+    background-color: var(--color-back-dark);
+  }
+
+  .column {
+    position: relative;
+    max-width: 390px;
+    margin-left: auto;
+    z-index: 2;
+  }
+
+  .contact {
+    padding: 15px 25px;
+    margin: 30px 0px 0px;
+    border-radius: var(--radius);
+    background-color: var(--color-back);
+    border-bottom: 2px solid rgb(214, 198, 203);
+
+    & > h3 {
+      font-size: 1.45rem;
+      font-weight: 700;
+
+      & > span {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 400;
+      }
+    }
+  }
+
+  .image {
+    position: absolute;
+    left: 14%;
+    bottom: 0;
+  }
+</style>
