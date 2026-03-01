@@ -2,21 +2,33 @@
 import '@fontsource-variable/josefin-sans'
 import Container from "./grid/container.astro"
 
-const prices = [
+interface DonationItem {
+  upa_donation_item: string;
+  upa_donation_application: string;
+  upa_donation_address: string;
+}
+
+interface Props {
+  donations?: DonationItem[];
+}
+
+const { donations } = Astro.props;
+
+const displayDonations = donations && donations.length > 0 ? donations : [
   {
-    price: 10,
-    description: 'Com este valor você ajuda a dar banho em um cachorro',
-    link: 'http://pag.ae/blyZBJD'
+    upa_donation_item: '10',
+    upa_donation_application: 'Com este valor você ajuda a dar banho em um cachorro',
+    upa_donation_address: 'http://pag.ae/blyZBJD'
   },
   {
-    price: 25,
-    description: 'Com este valor você ajuda a com a ração diária',
-    link: 'http://pag.ae/bgw94c6'
+    upa_donation_item: '25',
+    upa_donation_application: 'Com este valor você ajuda a com a ração diária',
+    upa_donation_address: 'http://pag.ae/bgw94c6'
   },
   {
-    price: 50,
-    description: 'Com este valor você ajuda a com a ração semanal',
-    link: 'http://pag.ae/bgw93dJ'
+    upa_donation_item: '50',
+    upa_donation_application: 'Com este valor você ajuda a com a ração semanal',
+    upa_donation_address: 'http://pag.ae/bgw93dJ'
   },
 ]
 ---
@@ -28,15 +40,15 @@ const prices = [
 <section>
   <div class="row">
     {
-      prices.map((item) => (
+      displayDonations.map((item) => (
         <div class="column">
           <h2 class="price">
             <span class="coin">R$</span>
-            {item.price}
+            {item.upa_donation_item}
             <div class="fraction">,00</div>
           </h2>
-          <p class="description">{item.description}</p>
-          <a class="link" href={item.link} target="_blank" rel="nooppener nofollow">Doar valor</a>
+          <p class="description">{item.upa_donation_application}</p>
+          <a class="link" href={item.upa_donation_address} target="_blank" rel="noopener noreferrer">Doar valor</a>
         </div>
       ))
     }
@@ -47,28 +59,26 @@ const prices = [
         <div class="fraction">,00</div>
       </h2>
       <p class="description">Digite e faça uma doação no valor que desejar</p>
-      <a class="link" href="" target="_blank" rel="nooppener nofollow">Doar valor</a>
+      <a class="link" href="" target="_blank" rel="noopener noreferrer">Doar valor</a>
     </div>
   </div>
 </section>
 
 <style>
   section {
+    padding: 60px 0;
     background-color: var(--color-prim);
   }
 
   .row {
     display: flex;
-    width: 100%;
-    max-width: var(--max-width);
-    margin: 0px auto;
   }
 
   .column {
     display: flex;
     flex-direction: column;
     width: 25%;
-    padding: 60px 15px;
+    padding: 15px;
   }
 
   .price {
@@ -169,5 +179,14 @@ const prices = [
     color: var(--color-back);
     background-color: transparent;
     transition: all 0.3s ease 0s;
+  }
+
+  @media screen and (max-width: 989px) {
+    .row {
+      flex-wrap: wrap;
+    }
+    .column {
+      width: 50%;
+    }
   }
 </style>

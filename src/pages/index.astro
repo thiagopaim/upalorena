@@ -1,5 +1,60 @@
 ---
-import Layout from '../layouts/layout.astro'
+import Layout from "../layouts/layout.astro"
+import Container from "../components/grid/container.astro"
+import Carousel from "../components/caroulsel.astro"
+
+interface SliderImage {
+  url: string
+  alt: string
+  width?: number
+  height?: number
+}
+
+interface SliderItem {
+  slider_image: SliderImage
+  slider_title: string
+  slider_about: string
+  slider_link?: string
+}
+
+interface AcfFields {
+  slider?: SliderItem[]
+}
+
+interface WordPressPage {
+  id: number
+  status: string
+  link: string
+  title: { rendered: string }
+  content: { rendered: string }
+  acf?: AcfFields
+}
+
+const response = await fetch("https://upalorena.com.br/wp/wp-json/wp/v2/pages?slug=home")
+let page: WordPressPage | null = null
+let slides: SliderItem[] = []
+
+if (response.ok) {
+  const data = (await response.json()) as WordPressPage[]
+  if (data.length > 0) {
+    page = data[0]
+    slides = page.acf?.slider || []
+  }
+}
 ---
 
-<Layout title="UPA - União Protretora dos Animais"></Layout>
+<Layout title={page ? `${page.title.rendered} | UPA - União Protetora dos Animais` : "Home | UPA - União Protetora dos Animais"}>
+  {slides.length > 0 && (
+    <Carousel slides={slides} interval={5000} />
+  )}
+</Layout>
+
+<style>
+  /* Ajuste para que o carrossel ocupe a largura total, saindo do container se necessário,
+     mas como está fora do Container, já deve ocupar 100% da largura do Layout/Main.
+     Verificar se o Layout/Main tem restrições. */
+
+  .page-content {
+    margin-top: 2rem;
+  }
+</style>

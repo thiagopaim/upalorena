@@ -1,0 +1,21 @@
+---
+interface Props {
+  align?: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline' | 'end'
+  justify?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly' | 'end'
+}
+
+const { align = 'center', justify = 'center' } = Astro.props as Props
+---
+
+<div class="flex" style={`align-items: ${align}; justify-content: ${justify};`}>
+  <slot />
+</div>
+
+<style>
+  .flex {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+</style>

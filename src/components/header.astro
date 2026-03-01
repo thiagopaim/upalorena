@@ -1,0 +1,265 @@
+---
+import Container from "./grid/container.astro"
+import Flex from "./grid/flex.astro"
+
+interface MenuItem {
+  id: number
+  title: string
+  url: string
+  order: number
+  object_slug: string
+}
+
+// Tenta buscar menus de plugins comuns (WP REST API Menus ou WP API Menus)
+async function fetchMenu(): Promise<MenuItem[] | null> {
+  try {
+    // Endpoint específico fornecido pelo usuário (Menu ID 2)
+    const response = await fetch("https://upalorena.com.br/wp/wp-json/wp-api-menus/v2/menus/2")
+
+    if (response.ok) {
+      const data = await response.json()
+      if (data && data.items) {
+        return data.items.map((item: any) => {
+          // Normaliza a URL para ser relativa ou absoluta correta
+          // Se a URL vier como https://upalorena.com.br/wp/slug/, removemos o domínio e o /wp
+          let url = item.url;
+          try {
+            const urlObj = new URL(item.url);
+            // Se for do mesmo domínio, normaliza o path
+            if (urlObj.hostname === 'upalorena.com.br') {
+              url = urlObj.pathname.replace(/^\/wp\//, "/");
+            }
+          } catch (e) {
+            // Se não for uma URL válida (ex: #anchor), mantém como está
+          }
+
+          return {
+            id: item.id,
+            title: item.title,
+            url: url,
+            order: item.order,
+            object_slug: item.object_slug
+          };
+        })
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao buscar menu específico (ID 2).", error)
+  }
+  return null
+}
+
+// Busca o menu
+let menuItems: MenuItem[] = await fetchMenu() || []
+
+const { pathname } = Astro.url;
+const normalizedCurrentPath = pathname.replace(/\/+$/, "");
+---
+
+<header>
+  <Container padding={"15px"}>
+    <a href="/" class="logo">
+      <img src="/images/logo-upa-lorena.png" alt="UPA - União Protetora dos Animais" />
+    </a>
+    <Flex justify={"end"} align={"center"}>
+      <nav class="menu">
+        {
+          menuItems && menuItems.length > 0
+            ? menuItems.map((item) => {
+               const isCurrent = item.url.replace(/\/+$/, "") === normalizedCurrentPath;
+               return (
+                <a href={item.url} class={isCurrent ? "active" : ""}>
+                  {item.title}
+                </a>
+              )
+            })
+            : (
+              <>
+                <a href="#adote">Adote</a>
+                <a href="#quem-somos">Quem Somos</a>
+                <a href="#contato">Contato</a>
+                <a href="#quero-ajudar" class="highlight">Quero Ajudar</a>
+              </>
+            )
+        }
+      </nav>
+      <div class="hamburguer-wrapper">
+        <div class="hamburguer"></div>
+      </div>
+    </Flex>
+  </Container>
+</header>
+
+<style>
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: var(--color-back-dark);
+  }
+
+  .logo {
+    position: relative;
+  }
+
+  .logo img {
+    display: block;
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    top: -5px;
+    left: -5px;
+    z-index: 2;
+    border-radius: 50%;
+    transition: 0.5s cubic-bezier(0.75, -0.5, 0, 1.75);
+    box-shadow: 0 3px 3px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .logo:hover img {
+    transform: scale(1.1) rotate(-15deg);
+    box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .menu {
+    gap: 24px;
+    display: flex;
+    align-items: center;
+  }
+
+  .menu a {
+    position: relative;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-prim);
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .menu a:hover {
+    color: var(--color-prim);
+  }
+
+  .menu a:after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-prim);
+    transition: width 0.2s ease;
+  }
+
+  .menu a:hover:after,
+  .menu a.active:after {
+    width: 100%;
+  }
+
+  /* .menu .highlight {
+    padding: 10px 18px;
+    border-radius: var(--radius);
+    border: 2px solid var(--color-comp);
+    color: var(--color-prim);
+    background-color: var(--color-comp);
+  }
+
+  .menu .highlight:hover {
+    color: var(--color-prim);
+    border-color: var(--color-comp-dark);
+    background-color: var(--color-comp-dark);
+  } */
+
+  .hamburguer {
+    position: absolute;
+    display: none;
+    top: 8px;
+    width: 24px;
+    height: 2px;
+    position: relative;
+    background-color: var(--color-prim);
+    transition: background-color 0.2s ease;
+  }
+
+  .hamburguer:after,
+  .hamburguer:before {
+    content: '';
+    display: block;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    position: absolute;
+    background-color: var(--color-prim);
+    transition: transform 0.2s ease;
+  }
+
+  .hamburguer:after {
+    top: 8px;
+  }
+
+  .hamburguer:before {
+    top: -8px;
+  }
+
+  .hamburguer-wrapper {
+    height: 22px;
+    cursor: pointer;
+    z-index: 20;
+  }
+
+  @media (max-width: 768px) {
+    .hamburguer {
+      display: block;
+      z-index: 20;
+    }
+
+    .hamburguer.active {
+      background-color: transparent;
+    }
+
+    .hamburguer.active:before {
+      transform: rotate(45deg);
+      top: 0;
+    }
+
+    .hamburguer.active:after {
+      transform: rotate(-45deg);
+      top: 0;
+    }
+
+    .menu {
+      position: absolute;
+      top: -10px;
+      left: 0;
+      width: 100%;
+      padding: 30px 0;
+      opacity: 0;
+      visibility: hidden;
+      flex-direction: column;
+      background-color: var(--color-back-dark);
+      transition: all 0.3s ease;
+      transform: translateY(-20px);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .menu.active {
+      top: 10px;
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+</style>
+
+<script>
+  const hamburguer = document.querySelector('.hamburguer-wrapper');
+  const menu = document.querySelector('.menu');
+
+  if (hamburguer && menu) {
+    hamburguer.addEventListener('click', () => {
+      hamburguer.classList.toggle('active');
+      menu.classList.toggle('active');
+    });
+  }
+</script>

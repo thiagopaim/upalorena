@@ -12,6 +12,6 @@
   "dependencies": {
     "@fontsource-variable/josefin-sans": "^5.0.3",
     "@fontsource/amatic-sc": "^5.0.2",
-    "astro": "^2.5.6"
+    "astro": "^5.17.3"
   }
 }

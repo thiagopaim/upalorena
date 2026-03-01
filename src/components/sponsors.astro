@@ -1,0 +1,130 @@
+---
+import Container from "./grid/container.astro"
+import Flex from "./grid/flex.astro";
+
+interface SponsorItem {
+  upa_colab_list_item: {
+    url: string;
+    alt: string;
+    title: string;
+  };
+  upa_colab_list_item_address: string;
+}
+
+interface Props {
+  sponsors?: SponsorItem[];
+  description?: string;
+}
+
+const { sponsors, description } = Astro.props;
+---
+
+{sponsors && sponsors.length > 0 && (
+  <section class="sponsors">
+    <Container>
+      <div class="sponsors-flex">
+        <div class="sponsors-text">
+          <h1>Nossos Parceiros</h1>
+          {description
+            ? <div set:html={description} />
+            : <p set:html="Venha fazer parte da Família de Colaboradores da UPA. Profissionais que doam seu tempo em prol da causa dos animais - a nossa causa! Quer ser um patrocinador? Seu lugar é aqui, junte-se à nós!" />
+          }
+        </div>
+        <div class="sponsors-grid">
+          {sponsors.map((sponsor) => (
+            <a
+              href={sponsor.upa_colab_list_item_address}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="sponsor-item"
+              title={sponsor.upa_colab_list_item.title}
+            >
+              <img
+                src={sponsor.upa_colab_list_item.url}
+                alt={sponsor.upa_colab_list_item.alt || sponsor.upa_colab_list_item.title}
+                loading="lazy"
+              />
+            </a>
+          ))}
+        </div>
+      </div>
+    </Container>
+  </section>
+)}
+
+<style>
+  .sponsors {
+    background-color: var(--color-text-light);
+  }
+
+  .sponsors-flex {
+    display: flex;
+    width: 100%;
+    padding: 0;
+    margin: 0 auto;
+    gap: 30px;
+  }
+
+  .sponsors-text {
+    min-width: 400px;
+    color: var(--color-back);
+
+    h1 {
+      color: var(--color-back);
+    }
+
+    p {
+      color: var(--color-back) !important;
+    }
+  }
+
+  .sponsors-description {
+    font-size: 0.875rem;
+    text-align: center;
+    opacity: 0.6;
+    color: var(--color-back);
+  }
+
+  .sponsors-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: end;
+    gap: 10px;
+
+    a {
+      display: block;
+      overflow: hidden;
+      width: calc(18% - 15px);
+      margin: 0px 0px 15px 15px;
+      border-radius: var(--radius);
+      background-color: var(--color-back);
+      transition: 0.3s cubic-bezier(0.75, -0.5, 0, 1.75);
+
+      &:hover {
+        transform: scale(1.1);
+      }
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 10px;
+      }
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .sponsors-flex {
+      flex-direction: column;
+    }
+
+    .sponsors-grid {
+      justify-content: center;
+
+      a {
+        max-width: 100px;
+      }
+    }
+  }
+</style>

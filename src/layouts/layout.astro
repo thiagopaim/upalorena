@@ -1,92 +1,161 @@
 ---
-import '@fontsource/amatic-sc'
-import Donation from '../components/donation.astro'
-import Volunteer from '../components/volunteer.astro'
+import "@fontsource/amatic-sc";
+import Header from "../components/header.astro";
+import Donation from "../components/donation.astro";
+import Volunteer from "../components/volunteer.astro";
+import Sponsors from "../components/sponsors.astro";
+import Footer from "../components/footer.astro";
 
 export interface Props {
-	title: string;
+  title: string;
 }
 
 const { title } = Astro.props;
+
+interface AcfOptions {
+  acf: {
+    upa_donations: {
+      upa_donation_item: string;
+      upa_donation_application: string;
+      upa_donation_address: string;
+    }[];
+    upa_volunteers: string;
+    upa_colab_about: string; // Adicionando caso precise para sponsors/colaboradores
+    upa_colab_list: {
+      upa_colab_list_item: {
+        url: string;
+        alt: string;
+        title: string;
+        width: number;
+        height: number;
+      };
+      upa_colab_list_item_address: string;
+    }[];
+  }
+}
+
+let globalData: AcfOptions['acf'] | null = null;
+
+try {
+  const response = await fetch("https://upalorena.com.br/wp/wp-json/acf/v3/options/options");
+  if (response.ok) {
+    const data = await response.json() as AcfOptions;
+    globalData = data.acf;
+  }
+} catch (error) {
+  console.error("Error fetching global options:", error);
+}
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-	<meta charset="UTF-8" />
-	<meta name="description" content="Astro description">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
-	<meta name="generator" content={Astro.generator} />
-	<title>{title}</title>
-</head>
-<body>
-  <!-- <Header /> -->
-  <main>
-    <slot />
-    <Donation />
-    <Volunteer />
-  </main>
-  <!-- <Footer /> -->
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <slot />
+      <Donation donations={globalData?.upa_donations} />
+      <Volunteer content={globalData?.upa_volunteers} />
+      <Sponsors sponsors={globalData?.upa_colab_list} description={globalData?.upa_colab_about} />
+    </main>
+    <Footer />
+  </body>
 </html>
 
 <style is:global>
-:root {
-  --color-prim: #007dc7;
-  --color-text: #27415d;
-  --color-text-light: #456180;
-  --color-back: #fbfbfd;
-  --color-back-dark: #f8f2f4;
-  --color-back-darker: #aaa;
-  --color-comp: #f0ea44;
-  --color-comp-dark: #99940c;
-  --max-width: 992px;
-  --radius: 6px;
-}
 
-html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
-  margin: 0px;
-  padding: 0px;
-  border: 0px;
-  font: inherit;
-  vertical-align: baseline;
-}
+  @import url('../styles/reset.css');
+  @import url('../styles/variables.css');
+  @import url('../styles/video.css');
 
-* {
-  box-sizing: border-box;
-}
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 160%;
+    color: var(--color-text);
+    overflow-x: hidden;
+  }
 
-body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 160%;
-  color: var(--color-text);
-}
+  h1 {
+    margin: 0px 0px 15px;
+    font-family: "Amatic SC", sans-serif;
+    font-size: 4rem;
+    line-height: 100%;
+    color: var(--color-prim);
+  }
 
-h1 {
-  margin: 0px 0px 15px;
-  font-family: 'Amatic SC', sans-serif;
-  font-size: 4rem;
-  line-height: 100%;
-  color: var(--color-prim);
-}
+  h2 {
+    margin: 0px 0px 15px;
+    font-family: "Amatic SC", sans-serif;
+    font-size: 3rem;
+    line-height: 100%;
+    color: var(--color-prim);
+  }
 
-h2 {
-  margin: 0px 0px 15px;
-  font-family: 'Amatic SC', sans-serif;
-  font-size: 4rem;
-  line-height: 100%;
-  color: var(--color-prim);
-}
+  p {
+    margin: 0 0 15px;
+    font-size: 1rem;
+    line-height: 160%;
+  }
 
-p {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 160%;
-}
+  ul {
+    padding: 0px 0px 0px 20px;
+    list-style: disc;
+  }
 
-ul {
-  padding: 0px 0px 0px 20px;
-  list-style: disc;
-}
+  img {
+    display: block;
+    line-height: 100%;
+    margin: 0;
+  }
+
+  a {
+    color: var(--color-prim);
+  }
+
+  /* image + caption */
+  .alignleft {
+    margin: 5px 15px 15px 0px;
+    float: left;
+  }
+
+  .wp-caption img {
+    display: inline-block;
+    border-radius: var(--radius) var(--radius) 0 0;
+    border: 1px solid var(--color-back-dark);
+    vertical-align: middle;
+  }
+
+  .wp-caption .wp-caption-text {
+    max-width: calc(100% - 10px);
+    border-radius: 0 0 var(--radius) var(--radius);
+    font-size: 0.75rem;
+    padding: 5px;
+    background-color: var(--color-back-dark);
+    text-align: center;
+  }
+
+  img:is([sizes="auto" i], [sizes^="auto," i]) {
+    contain: size !important;
+    contain-intrinsic-size: 300px 150px;
+  }
+
+  @media screen and (max-width: 989px) {
+    h1 {
+      font-size: 3rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+    }
+  }
 </style>

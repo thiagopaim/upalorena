@@ -1,4 +1,12 @@
-<div class="container">
+---
+interface Props {
+  padding?: string
+}
+
+const { padding = '60px 15px 15px' } = Astro.props as Props
+---
+
+<div class="container" style={`padding: ${padding};`}>
   <slot />
 </div>
 
@@ -6,7 +14,6 @@
   .container {
     width: 100%;
     max-width: var(--max-width);
-    padding: 60px 15px 15px;
     margin: 0px auto;
   }
 </style>

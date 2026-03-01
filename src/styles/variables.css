@@ -1,0 +1,12 @@
+:root {
+  --color-prim: #007dc7;
+  --color-text: #27415d;
+  --color-text-light: #456180;
+  --color-back: #ffffff;
+  --color-back-dark: #f8f2f4;
+  --color-back-darker: #aaa;
+  --color-comp: #f0ea44;
+  --color-comp-dark: #99940c;
+  --max-width: 992px;
+  --radius: 6px;
+}
