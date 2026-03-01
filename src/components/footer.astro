@@ -1,3 +1,32 @@
-<footer>
+---
+import Container from "./grid/container.astro"
+---
 
+<footer>
+  <div class="footer-content">
+    <p>UPA - União Protetora dos Animais.</p>
+    <p>
+      <a href="mailto:thiagopaim@msn.com" target="_blank">TP</a>
+    </p>
+  </div>
 </footer>
+
+<style>
+  footer {
+    padding: 30px 15px 15px;
+    color: var(--color-back-dark);
+    background-color: var(--color-text);
+    text-align: center;
+
+    p {
+      font-size: 0.75rem;
+      margin-bottom: 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: var(--color-text-light);
+      font-weight: bold;
+    }
+  }
+</style>

@@ -241,7 +241,7 @@ const normalizedCurrentPath = pathname.replace(/\/+$/, "");
       transition: all 0.3s ease;
       transform: translateY(-20px);
       border-radius: 0 0 var(--radius) var(--radius);
-      box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
     }
 
     .menu.active {
@@ -254,11 +254,12 @@ const normalizedCurrentPath = pathname.replace(/\/+$/, "");
 
 <script>
   const hamburguer = document.querySelector('.hamburguer-wrapper');
+  const hamburguerIcon = document.querySelector('.hamburguer');
   const menu = document.querySelector('.menu');
 
   if (hamburguer && menu) {
     hamburguer.addEventListener('click', () => {
-      hamburguer.classList.toggle('active');
+      hamburguerIcon?.classList.toggle('active');
       menu.classList.toggle('active');
     });
   }

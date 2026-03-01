@@ -29,6 +29,7 @@ const { content } = Astro.props;
   section {
     position: relative;
     background-color: var(--color-back-dark);
+    overflow: hidden;
   }
 
   .row {
@@ -74,5 +75,24 @@ const { content } = Astro.props;
     position: absolute;
     left: 14%;
     bottom: 0;
+  }
+
+  @media (max-width: 989px) {
+    .image {
+      left: -50px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .column {
+      width: 100%;
+      max-width: 100%;
+      padding-bottom: 200px;
+    }
+
+    .image {
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 </style>
