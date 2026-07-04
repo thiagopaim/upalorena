@@ -19,23 +19,44 @@ O servidor da HostGator é só PHP, então o build roda no GitHub Actions e o `d
 
 No repositório: **Settings → Secrets and variables → Actions**, crie:
 
-| Secret          | Valor                                              |
-| :-------------- | :------------------------------------------------- |
-| `FTP_SERVER`    | Host FTP da HostGator (ex.: `ftp.upalorena.com.br`) |
-| `FTP_USERNAME`  | Usuário FTP                                        |
-| `FTP_PASSWORD`  | Senha FTP                                          |
+| Secret            | Valor                                              |
+| :---------------- | :------------------------------------------------- |
+| `FTP_SERVER`      | Host FTP da HostGator (ex.: `ftp.upalorena.com.br`) |
+| `FTP_USERNAME`    | Usuário FTP                                        |
+| `FTP_PASSWORD`    | Senha FTP                                          |
+| `FTP_SERVER_DIR`  | Opcional. Padrão: `public_html/`. Use `./` se o FTP já abrir dentro de `public_html`. |
 
-Se o FTP abrir na home da conta (e não em `public_html`), edite `server-dir` em `.github/workflows/deploy.yml` para `public_html/`.
+### Verificar se os arquivos chegaram no lugar certo
+
+Cada deploy cria `https://upalorena.com.br/deploy-stamp.txt` com data, commit e id do run.
+
+1. Rode o workflow (push, WordPress ou *Run workflow*).
+2. Abra `/deploy-stamp.txt` no site (force refresh: Cmd+Shift+R).
+3. Se o arquivo **não existir** ou a data for antiga, o FTP está gravando na pasta errada:
+   - Crie o secret `FTP_SERVER_DIR` com valor `./` **ou** `public_html/` (o contrário do que estiver valendo).
+4. No log do Action, busque linhas `uploading` — se só aparecer sucesso sem upload, apague no servidor o arquivo `.ftp-deploy-sync-state.json` (na pasta do site) e rode de novo.
 
 ### 2. Token do GitHub para o WordPress
 
-1. Crie um [Personal Access Token](https://github.com/settings/tokens) (classic com `public_repo`, ou fine-grained com permissão de **Contents** no repositório `thiagopaim/upalorena`).
-2. No `wp-config.php` **do WordPress em `/wp`**, antes de `That's all, stop editing!`:
+O token fica **só no WordPress** (`wp-config.php`). Não é um secret do Actions — os secrets `FTP_*` servem apenas para o upload.
+
+Use um token **Classic** (fine-grained costuma retornar HTTP 403 neste endpoint):
+
+1. Abra [Tokens (classic)](https://github.com/settings/tokens)
+2. **Generate new token (classic)**
+3. Note: `upa-lorena-deploy`
+4. Expiration: o que preferir (90 days / No expiration)
+5. Marque o scope **`repo`** (o grupo inteiro)
+6. Generate token e copie (`ghp_...`)
+
+No `wp-config.php` **do WordPress em `/wp`**, antes de `That's all, stop editing!`:
 
 ```php
-define('UPALORENA_GH_TOKEN', 'cole_o_token_aqui');
+define('UPALORENA_GH_TOKEN', 'ghp_cole_o_token_aqui');
 define('UPALORENA_GH_REPO', 'thiagopaim/upalorena');
 ```
+
+Se o token antigo era fine-grained, apague-o e use o classic acima.
 
 ### 3. Plugin no WordPress
 

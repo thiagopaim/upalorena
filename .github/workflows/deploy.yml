@@ -33,6 +33,22 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Stamp build
+        run: |
+          {
+            echo "built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "commit=${GITHUB_SHA}"
+            echo "run=${GITHUB_RUN_ID}"
+            echo "event=${GITHUB_EVENT_NAME}"
+          } > dist/deploy-stamp.txt
+          echo "Arquivos gerados em dist/:"
+          find dist -type f | head -50
+          echo "--- deploy-stamp.txt ---"
+          cat dist/deploy-stamp.txt
+          echo "--- index.html (primeiros bytes) ---"
+          wc -c dist/index.html
+          shasum -a 256 dist/index.html
+
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -40,13 +56,16 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          # Se o FTP abrir na home (não em public_html), use: public_html/
-          server-dir: ./
-          # Nunca apaga a pasta do WordPress nem o estado do sync
+          # HostGator: o FTP costuma abrir na home da conta, não no site.
+          # Padrão: public_html/
+          # Se o site não atualizar, teste o secret FTP_SERVER_DIR = ./
+          # Se criar public_html/public_html, use FTP_SERVER_DIR = ./
+          server-dir: ${{ secrets.FTP_SERVER_DIR || 'public_html/' }}
+          log-level: verbose
+          # Nunca mexe na pasta do WordPress
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             wp/**
             wp/**/**
-            .ftp-deploy-sync-state.json
