@@ -45,13 +45,29 @@ Copie `wordpress/upalorena-deploy.php` para:
 wp-content/mu-plugins/upalorena-deploy.php
 ```
 
-Crie a pasta `mu-plugins` se ela não existir. Mu-plugins são carregados automaticamente.
+Crie a pasta `mu-plugins` se ela não existir. O arquivo precisa ficar **diretamente** nessa pasta (não em um subdiretório). Mu-plugins são carregados automaticamente — não aparece em “Plugins”.
 
-### 4. Testar
+### 4. Testar e diagnosticar
 
-- **Manual:** Actions → *Build and deploy* → *Run workflow*
-- **Pelo WP:** publique ou atualize uma página e confira a aba Actions no GitHub
+No WordPress: **Ferramentas → Deploy do site**.
+
+1. Confirme que o plugin está carregado e o token configurado.
+2. Clique em **Disparar deploy agora**.
+3. A página mostra o resultado (sucesso, HTTP 401/404, bloqueio de rede, etc.).
+4. Se o botão funcionar, salvar uma página publicada também deve disparar o deploy.
+
+No GitHub: Actions → *Build and deploy*.
 
 Há também um rebuild agendado a cada hora (UTC) como rede de segurança. Builds em sequência são limitados a um a cada 2 minutos no WordPress, e o workflow cancela execuções anteriores se um novo disparo chegar no meio do deploy.
 
 A pasta `wp/` no servidor **não é apagada** pelo deploy FTP.
+
+### Problemas comuns
+
+| Sintoma | Causa provável |
+| :------ | :------------- |
+| Página “Deploy do site” não existe | Arquivo não está em `wp-content/mu-plugins/upalorena-deploy.php` |
+| Token ausente | Falta `UPALORENA_GH_TOKEN` no `wp-config.php` |
+| HTTP 401/403 | Token inválido ou sem permissão `public_repo` / Contents write |
+| HTTP 404 | Repo errado em `UPALORENA_GH_REPO` ou token sem acesso |
+| Falha de rede | HostGator bloqueando saída para `api.github.com` |
