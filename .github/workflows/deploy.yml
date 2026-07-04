@@ -12,7 +12,8 @@ on:
 
 concurrency:
   group: deploy-production
-  cancel-in-progress: true
+  # Nunca cancela upload FTP no meio — evita estado parcial no servidor
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -30,7 +31,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Dá tempo do WordPress gravar/limpar cache antes do build ler a API
+      - name: Wait for WordPress
+        if: github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+        run: sleep 20
+
       - name: Build
+        env:
+          BUILD_ID: ${{ github.run_id }}-${{ github.run_attempt }}
         run: npm run build
 
       - name: Stamp build
@@ -39,15 +47,36 @@ jobs:
             echo "built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
             echo "commit=${GITHUB_SHA}"
             echo "run=${GITHUB_RUN_ID}"
+            echo "attempt=${GITHUB_RUN_ATTEMPT}"
             echo "event=${GITHUB_EVENT_NAME}"
           } > dist/deploy-stamp.txt
           echo "Arquivos gerados em dist/:"
           find dist -type f | head -50
           echo "--- deploy-stamp.txt ---"
           cat dist/deploy-stamp.txt
-          echo "--- index.html (primeiros bytes) ---"
+          echo "--- index.html ---"
           wc -c dist/index.html
           shasum -a 256 dist/index.html
+
+      # O FTP-Deploy só sobe arquivos cujo hash mudou. Se o state remoto estiver
+      # desincronizado (ou o build repetir HTML por cache), só o stamp atualiza.
+      # Apagar o state força reenvio de tudo em website/.
+      - name: Reset FTP sync state
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR || 'website/' }}
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lftp
+          lftp -c "
+            set ssl:verify-certificate no;
+            open -u ${FTP_USERNAME},${FTP_PASSWORD} ${FTP_SERVER};
+            cd ${FTP_SERVER_DIR};
+            rm -f .ftp-deploy-sync-state.json;
+            bye
+          " || echo "State ausente ou falha ao remover — o deploy segue mesmo assim."
 
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

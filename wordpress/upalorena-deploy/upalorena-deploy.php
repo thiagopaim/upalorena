@@ -2,7 +2,7 @@
 /**
  * Plugin Name: UPA Lorena Deploy
  * Description: Dispara o rebuild do site estatico no GitHub Actions ao salvar conteudo no WordPress.
- * Version: 1.2.1
+ * Version: 1.2.2
  * Author: UPA Lorena
  * Text Domain: upalorena-deploy
  *
@@ -174,7 +174,7 @@ if (!function_exists('upalorena_trigger_deploy')) {
         if ($code === 204) {
             $result = array(
                 'success' => true,
-                'message' => 'Deploy disparado com sucesso no GitHub Actions.',
+                'message' => 'Disparo aceito pelo GitHub (HTTP 204). Isso nao confirma upload dos arquivos — confira o workflow em Actions e /deploy-stamp.txt no site.',
                 'reason' => $reason,
                 'code' => $code,
             );
@@ -246,7 +246,7 @@ if (!function_exists('upalorena_deploy_admin_page')) {
 
         if (isset($_GET['deployed'])) {
             if ($_GET['deployed'] === '1') {
-                echo '<div class="notice notice-success is-dismissible"><p>Deploy disparado. Confira a aba Actions no GitHub em alguns segundos.</p></div>';
+                echo '<div class="notice notice-success is-dismissible"><p><strong>Disparo aceito.</strong> O GitHub vai buildar e enviar os arquivos por FTP. Isso leva 1–3 minutos — acompanhe em Actions e valide <code>/deploy-stamp.txt</code> (e as datas dos HTML no File Manager).</p></div>';
             } else {
                 echo '<div class="notice notice-error is-dismissible"><p>Falha ao disparar o deploy. Veja o status abaixo.</p></div>';
             }
@@ -275,7 +275,7 @@ if (!function_exists('upalorena_deploy_admin_page')) {
             echo '<table class="widefat striped" style="max-width:720px;margin:1em 0;">';
             echo '<tbody>';
             echo '<tr><th style="width:220px">Quando</th><td>' . esc_html((string) (isset($last['time']) ? $last['time'] : '-')) . '</td></tr>';
-            echo '<tr><th>Resultado</th><td style="color:' . ($ok ? 'green' : '#b32d2e') . '">' . ($ok ? 'Sucesso' : 'Falha') . '</td></tr>';
+            echo '<tr><th>Resultado do disparo</th><td style="color:' . ($ok ? 'green' : '#b32d2e') . '">' . ($ok ? 'Aceito pelo GitHub' : 'Falha') . '</td></tr>';
             echo '<tr><th>Motivo</th><td><code>' . esc_html((string) (isset($last['reason']) ? $last['reason'] : '-')) . '</code></td></tr>';
             if (isset($last['code'])) {
                 echo '<tr><th>HTTP</th><td>' . esc_html((string) $last['code']) . '</td></tr>';

@@ -46,7 +46,9 @@ Cada deploy cria `deploy-stamp.txt` dentro de `website/`. Com o `.htaccess`, a U
 1. Rode o workflow (push, WordPress ou *Run workflow*).
 2. Abra `/deploy-stamp.txt` (force refresh: Cmd+Shift+R).
 3. Se a data for antiga ou der 404, confira `FTP_SERVER_DIR` e se o `.htaccess` está na raiz do `public_html`.
-4. No log do Action, busque linhas `uploading`. Se não houver upload, apague `website/.ftp-deploy-sync-state.json` no servidor e rode de novo.
+4. No log do Action, busque linhas `uploading` nos HTML (não só em `deploy-stamp.txt`). O workflow apaga o state do FTP antes de cada deploy para forçar reenvio completo.
+
+**Importante:** o painel “Deploy UPA” no WordPress só confirma que o GitHub *aceitou* o disparo (HTTP 204). O upload real é o job em Actions; se só `deploy-stamp.txt` mudar de data e os `.html` não, o build repetiu conteúdo antigo (cache da API) ou o state do FTP pulou os arquivos.
 
 ### 2. Token do GitHub para o WordPress
 

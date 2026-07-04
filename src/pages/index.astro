@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/layout.astro"
 import Carousel from "../components/caroulsel.astro"
+import { fetchWp } from "../lib/wp-api"
 
 interface SliderImage {
   url: string
@@ -29,7 +30,7 @@ interface WordPressPage {
   acf?: AcfFields
 }
 
-const response = await fetch("https://upalorena.com.br/wp/wp-json/wp/v2/pages?slug=home")
+const response = await fetchWp("/wp/v2/pages?slug=home")
 let page: WordPressPage | null = null
 let slides: SliderItem[] = []
 

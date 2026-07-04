@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/layout.astro"
+import { fetchWp } from "../lib/wp-api"
 
 interface WordPressPage {
   id: number
@@ -11,7 +12,7 @@ interface WordPressPage {
 }
 
 export async function getStaticPaths() {
-  const response = await fetch("https://upalorena.com.br/wp/wp-json/wp/v2/pages?per_page=100&_fields=id,status,link,title,menu_order,content&orderby=menu_order&order=asc")
+  const response = await fetchWp("/wp/v2/pages?per_page=100&_fields=id,status,link,title,menu_order,content&orderby=menu_order&order=asc")
 
   if (!response.ok) {
     return []
