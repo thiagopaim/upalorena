@@ -21,16 +21,21 @@ export async function getStaticPaths() {
 
   const pages = data.filter((page) => page.status === "publish")
 
-  return pages.map((page) => {
+  return pages.flatMap((page) => {
     const url = new URL(page.link)
     const normalizedPath = url.pathname.replace(/^\/wp\//, "/").replace(/\/+$/, "")
     const segments = normalizedPath.split("/").filter(Boolean)
-    const slug = segments[segments.length - 1] || ""
+    const slug = segments[segments.length - 1]
 
-    return {
+    // Home (path vazio) já é servida por index.astro; slug vazio é inválido em [slug].astro
+    if (!slug || slug === "home") {
+      return []
+    }
+
+    return [{
       params: { slug },
       props: { page },
-    }
+    }]
   })
 }
 

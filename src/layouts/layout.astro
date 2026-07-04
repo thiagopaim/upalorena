@@ -1,5 +1,9 @@
 ---
-import "@fontsource/amatic-sc";
+import "@fontsource/amatic-sc/latin-400.css";
+import "@fontsource/amatic-sc/latin-700.css";
+import amatic400 from "@fontsource/amatic-sc/files/amatic-sc-latin-400-normal.woff2?url";
+import amatic700 from "@fontsource/amatic-sc/files/amatic-sc-latin-700-normal.woff2?url";
+import josefinLatin from "@fontsource-variable/josefin-sans/files/josefin-sans-latin-wght-normal.woff2?url";
 import Header from "../components/header.astro";
 import Donation from "../components/donation.astro";
 import Volunteer from "../components/volunteer.astro";
@@ -61,6 +65,28 @@ try {
     <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+
+    <link
+      rel="preload"
+      href={amatic400}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={amatic700}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href={josefinLatin}
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
     <link rel="icon" href="https://upalorena.com.br/favicon/favicon.ico" /><meta
       name="viewport"

@@ -1,47 +1,57 @@
-# Astro Starter Kit: Minimal
+# UPA Lorena
+
+Site estático em [Astro](https://astro.build), com conteúdo vindo da API REST do WordPress (`/wp`).
+
+## Comandos
+
+| Comando           | Ação                                      |
+| :---------------- | :---------------------------------------- |
+| `npm install`     | Instala dependências                      |
+| `npm run dev`     | Servidor local de desenvolvimento         |
+| `npm run build`   | Gera o site em `./dist/`                  |
+| `npm run preview` | Pré-visualiza o build localmente          |
+
+## Deploy automático (HostGator + GitHub Actions)
+
+O servidor da HostGator é só PHP, então o build roda no GitHub Actions e o `dist/` é enviado por FTP. O WordPress dispara um rebuild ao salvar páginas, menus ou options do ACF.
+
+### 1. Secrets no GitHub
+
+No repositório: **Settings → Secrets and variables → Actions**, crie:
+
+| Secret          | Valor                                              |
+| :-------------- | :------------------------------------------------- |
+| `FTP_SERVER`    | Host FTP da HostGator (ex.: `ftp.upalorena.com.br`) |
+| `FTP_USERNAME`  | Usuário FTP                                        |
+| `FTP_PASSWORD`  | Senha FTP                                          |
+
+Se o FTP abrir na home da conta (e não em `public_html`), edite `server-dir` em `.github/workflows/deploy.yml` para `public_html/`.
+
+### 2. Token do GitHub para o WordPress
+
+1. Crie um [Personal Access Token](https://github.com/settings/tokens) (classic com `public_repo`, ou fine-grained com permissão de **Contents** no repositório `thiagopaim/upalorena`).
+2. No `wp-config.php` do WordPress, **antes** de `That's all, stop editing!`:
+
+```php
+define('UPALORENA_GH_TOKEN', 'cole_o_token_aqui');
+define('UPALORENA_GH_REPO', 'thiagopaim/upalorena');
+```
+
+### 3. Plugin no WordPress
+
+Copie `wordpress/upalorena-deploy.php` para:
 
 ```
-npm create astro@latest -- --template minimal
+wp-content/mu-plugins/upalorena-deploy.php
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/minimal)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/minimal)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/minimal/devcontainer.json)
+Crie a pasta `mu-plugins` se ela não existir. Mu-plugins são carregados automaticamente.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+### 4. Testar
 
-## 🚀 Project Structure
+- **Manual:** Actions → *Build and deploy* → *Run workflow*
+- **Pelo WP:** publique ou atualize uma página e confira a aba Actions no GitHub
 
-Inside of your Astro project, you'll see the following folders and files:
+Há também um rebuild agendado a cada hora (UTC) como rede de segurança. Builds em sequência são limitados a um a cada 2 minutos no WordPress, e o workflow cancela execuções anteriores se um novo disparo chegar no meio do deploy.
 
-```
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:3000`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+A pasta `wp/` no servidor **não é apagada** pelo deploy FTP.
