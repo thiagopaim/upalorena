@@ -56,16 +56,15 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
-          # HostGator: o FTP costuma abrir na home da conta, não no site.
-          # Padrão: public_html/
-          # Se o site não atualizar, teste o secret FTP_SERVER_DIR = ./
-          # Se criar public_html/public_html, use FTP_SERVER_DIR = ./
-          server-dir: ${{ secrets.FTP_SERVER_DIR || 'public_html/' }}
+          # Site estático em public_html/website/ (mascarado na raiz via .htaccess)
+          # Secret FTP_SERVER_DIR sobrescreve o padrão se o FTP já abrir em public_html.
+          server-dir: ${{ secrets.FTP_SERVER_DIR || 'website/' }}
           log-level: verbose
-          # Nunca mexe na pasta do WordPress
+          # Nunca mexe na pasta do WordPress nem no .htaccess da raiz
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
             wp/**
             wp/**/**
+            .htaccess

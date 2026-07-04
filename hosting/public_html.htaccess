@@ -1,0 +1,39 @@
+# UPA Lorena — raiz do public_html
+#
+# Instalação (uma vez, manual via FTP/cPanel):
+#   Envie este arquivo para:
+#     public_html/.htaccess
+#   (renomeie para .htaccess se o cliente FTP esconder o ponto)
+#
+# NÃO coloque este arquivo dentro de public_html/website/
+# O deploy do Astro vai só para website/; este arquivo fica na raiz.
+#
+# Efeito:
+#   upalorena.com.br/        → website/index.html
+#   upalorena.com.br/pagina/ → website/pagina/
+#   upalorena.com.br/wp/     → WordPress (intacto)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # WordPress em /wp — não reescreve
+  RewriteRule ^wp(/|$) - [L]
+
+  # Acesso direto a /website/ (e arquivos internos do deploy)
+  RewriteRule ^website(/|$) - [L]
+
+  # Home do domínio → site Astro
+  RewriteRule ^$ /website/ [L]
+
+  # Demais rotas → pasta website/, sem mostrar /website na URL
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)$ /website/$1 [L]
+</IfModule>
+
+# 404 do site estático (Astro)
+ErrorDocument 404 /website/404.html
+
+# Evita listagem de diretórios na raiz
+Options -Indexes

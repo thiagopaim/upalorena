@@ -24,17 +24,29 @@ No repositório: **Settings → Secrets and variables → Actions**, crie:
 | `FTP_SERVER`      | Host FTP da HostGator (ex.: `ftp.upalorena.com.br`) |
 | `FTP_USERNAME`    | Usuário FTP                                        |
 | `FTP_PASSWORD`    | Senha FTP                                          |
-| `FTP_SERVER_DIR`  | Opcional. Padrão: `public_html/`. Use `./` se o FTP já abrir dentro de `public_html`. |
+| `FTP_SERVER_DIR`  | Opcional. Padrão: `website/`. Se o FTP já abrir em `public_html`, use `website/`; se abrir na home, use `public_html/website/`. |
+
+### Mascarar `/website/` na raiz (`.htaccess`)
+
+O Astro é publicado em `public_html/website/`, mas as URLs públicas ficam na raiz (`/`), sem mostrar `/website/`. O WordPress em `/wp/` não é afetado.
+
+1. Envie **uma vez** (FTP/cPanel) o arquivo `hosting/public_html.htaccess` para:
+   ```
+   public_html/.htaccess
+   ```
+2. Se existir `public_html/index.html` antigo na raiz, **remova ou renomeie** — senão a home pode continuar servindo o arquivo velho.
+3. O deploy automático **não** sobrescreve esse `.htaccess` (ele fica fora de `website/`).
 
 ### Verificar se os arquivos chegaram no lugar certo
 
-Cada deploy cria `https://upalorena.com.br/deploy-stamp.txt` com data, commit e id do run.
+Cada deploy cria `deploy-stamp.txt` dentro de `website/`. Com o `.htaccess`, a URL pública é:
+
+`https://upalorena.com.br/deploy-stamp.txt`
 
 1. Rode o workflow (push, WordPress ou *Run workflow*).
-2. Abra `/deploy-stamp.txt` no site (force refresh: Cmd+Shift+R).
-3. Se o arquivo **não existir** ou a data for antiga, o FTP está gravando na pasta errada:
-   - Crie o secret `FTP_SERVER_DIR` com valor `./` **ou** `public_html/` (o contrário do que estiver valendo).
-4. No log do Action, busque linhas `uploading` — se só aparecer sucesso sem upload, apague no servidor o arquivo `.ftp-deploy-sync-state.json` (na pasta do site) e rode de novo.
+2. Abra `/deploy-stamp.txt` (force refresh: Cmd+Shift+R).
+3. Se a data for antiga ou der 404, confira `FTP_SERVER_DIR` e se o `.htaccess` está na raiz do `public_html`.
+4. No log do Action, busque linhas `uploading`. Se não houver upload, apague `website/.ftp-deploy-sync-state.json` no servidor e rode de novo.
 
 ### 2. Token do GitHub para o WordPress
 
