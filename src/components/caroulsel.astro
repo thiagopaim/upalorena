@@ -39,10 +39,13 @@ const hasSlides = slides && slides.length > 0
             <div class="carousel-image">
                <img
                 src={slide.slider_image.url}
-                alt={slide.slider_image.alt || slide.slider_title}
+                alt={slide.slider_image.alt?.trim() || slide.slider_title || "Destaque UPA Lorena"}
                 loading={slideIndex === 0 ? "eager" : "lazy"}
-                width={slide.slider_image.width}
-                height={slide.slider_image.height}
+                decoding="async"
+                fetchpriority={slideIndex === 0 ? "high" : "auto"}
+                width={slide.slider_image.width || 1920}
+                height={slide.slider_image.height || 800}
+                sizes="100vw"
               />
             </div>
             <div class="carousel-caption">

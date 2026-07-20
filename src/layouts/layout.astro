@@ -13,9 +13,42 @@ import { fetchWp } from "../lib/wp-api";
 
 export interface Props {
   title: string;
+  description?: string;
+  image?: string;
 }
 
-const { title } = Astro.props;
+const DEFAULT_DESCRIPTION =
+  "A União Protetora dos Animais de Lorena é uma organização sem fins lucrativos com propósito de acolher, tratar e encaminhar para adoção os animais abandonados.";
+
+const { title, description = DEFAULT_DESCRIPTION, image } = Astro.props;
+
+const siteOrigin = Astro.site?.origin ?? "https://upalorena.com.br";
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? siteOrigin);
+const ogImageURL = new URL(
+  image ?? "/images/logo-upa-lorena.png",
+  Astro.site ?? siteOrigin,
+).href;
+const logoURL = new URL("/images/logo-upa-lorena.png", Astro.site ?? siteOrigin)
+  .href;
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  name: "UPA - União Protetora dos Animais de Lorena",
+  alternateName: "UPA Lorena",
+  url: siteOrigin,
+  logo: logoURL,
+  email: "contato@upalorena.com.br",
+  description: DEFAULT_DESCRIPTION,
+  areaServed: {
+    "@type": "City",
+    name: "Lorena",
+    containedInPlace: {
+      "@type": "State",
+      name: "São Paulo",
+    },
+  },
+};
 
 interface AcfOptions {
   acf: {
@@ -56,14 +89,36 @@ try {
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content="Astro description" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
+    <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#f8f2f4" />
     <title>{title}</title>
+
+    <link rel="canonical" href={canonicalURL.href} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/images/logo-upa-lorena.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="UPA Lorena" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL.href} />
+    <meta property="og:image" content={ogImageURL} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organizationSchema)}
+    />
 
     <link
       rel="preload"
@@ -85,94 +140,6 @@ try {
       as="font"
       type="font/woff2"
       crossorigin
-    />
-
-    <link rel="icon" href="https://upalorena.com.br/favicon/favicon.ico" /><meta
-      name="viewport"
-      content="width=device-width,initial-scale=1"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="https://upalorena.com.br/favicon/apple-icon-57x57.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="https://upalorena.com.br/favicon/apple-icon-60x60.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="https://upalorena.com.br/favicon/apple-icon-72x72.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="https://upalorena.com.br/favicon/apple-icon-76x76.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="https://upalorena.com.br/favicon/apple-icon-114x114.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="https://upalorena.com.br/favicon/apple-icon-120x120.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="https://upalorena.com.br/favicon/apple-icon-144x144.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="https://upalorena.com.br/favicon/apple-icon-152x152.png"
-    />
-    <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="https://upalorena.com.br/favicon/apple-icon-180x180.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="192x192"
-      href="https://upalorena.com.br/favicon/android-icon-192x192.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="https://upalorena.com.br/favicon/favicon-32x32.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="96x96"
-      href="https://upalorena.com.br/favicon/favicon-96x96.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="16x16"
-      href="https://upalorena.com.br/favicon/favicon-16x16.png"
-    />
-    <link
-      rel="manifest"
-      href="https://upalorena.com.br/favicon/manifest.json"
-    />
-    <meta name="msapplication-TileColor" content="#ffffff" />
-    <meta
-      name="msapplication-TileImage"
-      content="/favicon/ms-icon-144x144.png"
-    />
-    <meta name="theme-color" content="#f8f2f4" />
-    <meta
-      name="description"
-      content="A União Protetora dos Animais de Lorena é uma organização sem fins lucrativos com propósito de acolher, tratar e encaminhar para adoção os animais abandonados."
     />
   </head>
   <body>

@@ -7,6 +7,8 @@ interface SponsorItem {
     url: string;
     alt: string;
     title: string;
+    width?: number;
+    height?: number;
   };
   upa_colab_list_item_address: string;
 }
@@ -41,8 +43,12 @@ const { sponsors, description } = Astro.props;
             >
               <img
                 src={sponsor.upa_colab_list_item.url}
-                alt={sponsor.upa_colab_list_item.alt || sponsor.upa_colab_list_item.title}
+                alt={sponsor.upa_colab_list_item.alt?.trim() || sponsor.upa_colab_list_item.title || "Parceiro UPA"}
                 loading="lazy"
+                decoding="async"
+                width={sponsor.upa_colab_list_item.width || 200}
+                height={sponsor.upa_colab_list_item.height || 120}
+                sizes="(max-width: 640px) 40vw, 160px"
               />
             </a>
           ))}

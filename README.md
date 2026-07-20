@@ -30,12 +30,19 @@ No repositório: **Settings → Secrets and variables → Actions**, crie:
 
 O Astro é publicado em `public_html/website/`, mas as URLs públicas ficam na raiz (`/`), sem mostrar `/website/`. O WordPress em `/wp/` não é afetado.
 
-1. Envie **uma vez** (FTP/cPanel) o arquivo `hosting/public_html.htaccess` para:
+O `.htaccess` também:
+- redireciona `www.upalorena.com.br` → `https://upalorena.com.br` (301)
+- envia header HSTS em HTTPS
+- define cache longo para CSS, JS, imagens e fontes
+
+1. Envie (FTP/cPanel) o arquivo `hosting/public_html.htaccess` para:
    ```
    public_html/.htaccess
    ```
 2. Se existir `public_html/index.html` antigo na raiz, **remova ou renomeie** — senão a home pode continuar servindo o arquivo velho.
 3. O deploy automático **não** sobrescreve esse `.htaccess` (ele fica fora de `website/`).
+4. **Sempre que `hosting/public_html.htaccess` mudar no repositório**, reenvie manualmente para `public_html/.htaccess` — senão redirects, HSTS e cache não entram em produção.
+5. No DNS/cPanel, confirme que o certificado SSL cobre apex + `www` e que ambos apontam para o mesmo host.
 
 ### Verificar se os arquivos chegaram no lugar certo
 
@@ -114,3 +121,30 @@ A pasta `wp/` no servidor **não é apagada** pelo deploy FTP.
 | HTTP 401/403 | Token inválido ou sem `public_repo` / Contents write |
 | HTTP 404 | Repo errado em `UPALORENA_GH_REPO` ou token sem acesso |
 | Falha de rede | HostGator bloqueando saída para `api.github.com` |
+
+## SEO — checklist operacional (WordPress)
+
+O site Astro já cobre meta tags, canonical, sitemap (`/sitemap-index.xml`), `robots.txt` e dados estruturados. O restante depende do conteúdo e das mídias no WordPress.
+
+### Imagens (WebP e peso)
+
+- Subir slides e logos em tamanho adequado ao layout (evitar full-size de câmera).
+- Preferir WebP na biblioteca de mídia (nativo do WP ou plugin tipo Imagify/ShortPixel).
+- Preencher o campo **alt** nos ACF do slider e dos parceiros — nunca deixar vazio.
+- Conferir `width`/`height` nos campos de imagem ACF quando disponíveis.
+
+### Conteúdo de confiança (E-E-A-T)
+
+Criar ou atualizar páginas no WordPress e incluir no menu:
+
+- [ ] Quem somos / equipe
+- [ ] Transparência / prestação de contas (quando houver)
+- [ ] Política de privacidade
+- [ ] Casos de impacto / adoção **com datas visíveis**
+
+Após publicar, dispare o deploy (menu **Deploy UPA**) e valide:
+
+- `https://upalorena.com.br/robots.txt`
+- `https://upalorena.com.br/sitemap-index.xml`
+- view-source da home (description, Open Graph, canonical)
+- redirect `https://www.upalorena.com.br/` → apex

@@ -8,11 +8,30 @@ interface WordPressPage {
   link: string
   title: { rendered: string }
   content: { rendered: string }
+  excerpt?: { rendered: string }
   menu_order?: number
 }
 
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+}
+
+function pageDescription(page: WordPressPage): string | undefined {
+  const fromExcerpt = page.excerpt?.rendered
+    ? stripHtml(page.excerpt.rendered)
+    : ""
+  if (fromExcerpt) return fromExcerpt.slice(0, 220)
+
+  const fromContent = stripHtml(page.content.rendered)
+  if (!fromContent) return undefined
+  return fromContent.slice(0, 220)
+}
+
 export async function getStaticPaths() {
-  const response = await fetchWp("/wp/v2/pages?per_page=100&_fields=id,status,link,title,menu_order,content&orderby=menu_order&order=asc")
+  const response = await fetchWp("/wp/v2/pages?per_page=100&_fields=id,status,link,title,menu_order,content,excerpt&orderby=menu_order&order=asc")
 
   if (!response.ok) {
     return []
@@ -45,9 +64,13 @@ interface Props {
 }
 
 const { page } = Astro.props as Props
+const description = pageDescription(page)
 ---
 
-<Layout title={`${page.title.rendered} | UPA - União Protetora dos Animais`}>
+<Layout
+  title={`${page.title.rendered} | UPA - União Protetora dos Animais`}
+  description={description}
+>
   <section class="page">
     <h1>{page.title.rendered}</h1>
     <article class="page-content" set:html={page.content.rendered} />
@@ -73,4 +96,3 @@ const { page } = Astro.props as Props
     text-decoration: underline;
   }
 </style>
-

@@ -27,7 +27,15 @@ interface WordPressPage {
   link: string
   title: { rendered: string }
   content: { rendered: string }
+  excerpt?: { rendered: string }
   acf?: AcfFields
+}
+
+function stripHtml(html: string): string {
+  return html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
 }
 
 const response = await fetchWp("/wp/v2/pages?slug=home")
@@ -41,9 +49,19 @@ if (response.ok) {
     slides = page.acf?.slider || []
   }
 }
+
+const excerptText = page?.excerpt?.rendered
+  ? stripHtml(page.excerpt.rendered)
+  : ""
+const description = excerptText || undefined
+const ogImage = slides[0]?.slider_image?.url || undefined
 ---
 
-<Layout title={page ? `${page.title.rendered} | UPA - União Protetora dos Animais` : "Home | UPA - União Protetora dos Animais"}>
+<Layout
+  title={page ? `${page.title.rendered} | UPA - União Protetora dos Animais` : "Home | UPA - União Protetora dos Animais"}
+  description={description}
+  image={ogImage}
+>
   {slides.length > 0 && (
     <Carousel slides={slides} interval={5000} />
   )}
