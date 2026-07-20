@@ -39,10 +39,22 @@ O `.htaccess` também:
    ```
    public_html/.htaccess
    ```
-2. Se existir `public_html/index.html` antigo na raiz, **remova ou renomeie** — senão a home pode continuar servindo o arquivo velho.
-3. O deploy automático **não** sobrescreve esse `.htaccess` (ele fica fora de `website/`).
-4. **Sempre que `hosting/public_html.htaccess` mudar no repositório**, reenvie manualmente para `public_html/.htaccess` — senão redirects, HSTS e cache não entram em produção.
-5. No DNS/cPanel, confirme que o certificado SSL cobre apex + `www` e que ambos apontam para o mesmo host.
+2. Envie (FTP/cPanel) o arquivo `hosting/wp-content-uploads.htaccess` para:
+   ```
+   public_html/wp/wp-content/uploads/.htaccess
+   ```
+   (cache longo das mídias do WordPress usadas no hero e nos logos de parceiros)
+3. Se existir `public_html/index.html` antigo na raiz, **remova ou renomeie** — senão a home pode continuar servindo o arquivo velho.
+4. O deploy automático **não** sobrescreve o `.htaccess` da raiz (fica fora de `website/`). O `public/.htaccess` do Astro **vai** para `website/.htaccess` a cada build (cache de `/_astro` e `/images`).
+5. **Sempre que `hosting/public_html.htaccess` ou `hosting/wp-content-uploads.htaccess` mudarem no repositório**, reenvie manualmente — senão redirects, HSTS e cache não entram em produção.
+6. No DNS/cPanel, confirme que o certificado SSL cobre apex + `www` e que ambos apontam para o mesmo host.
+
+Validação pós-deploy (deve incluir `Cache-Control: public, max-age=31536000`):
+
+```bash
+curl -sI https://upalorena.com.br/images/logo-upa-lorena.png | grep -i cache
+curl -sI https://upalorena.com.br/wp/wp-content/uploads/2018/04/herob.jpg | grep -i cache
+```
 
 ### Verificar se os arquivos chegaram no lugar certo
 
@@ -132,6 +144,8 @@ O site Astro já cobre meta tags, canonical, sitemap (`/sitemap-index.xml`), `ro
 - Preferir WebP na biblioteca de mídia (nativo do WP ou plugin tipo Imagify/ShortPixel).
 - Preencher o campo **alt** nos ACF do slider e dos parceiros — nunca deixar vazio.
 - Conferir `width`/`height` nos campos de imagem ACF quando disponíveis.
+- **Parceiros:** substituir logos em **GIF** por PNG/WebP estático; gerar thumbs ~160–200px (hoje há PNG/JPEG >700px exibidos pequenos).
+- **Hero (slider):** reexportar `herob` / `heroc` em WebP/AVIF (com JPEG fallback), largura máxima ~1600px e compressão adequada — isso corta a maior fatia de “Improve image delivery” no PageSpeed.
 
 ### Conteúdo de confiança (E-E-A-T)
 

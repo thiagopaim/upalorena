@@ -26,7 +26,7 @@ const { sponsors, description } = Astro.props;
     <Container>
       <div class="sponsors-flex">
         <div class="sponsors-text">
-          <h1>Nossos Parceiros</h1>
+          <h2>Nossos Parceiros</h2>
           {description
             ? <div set:html={description} />
             : <p set:html="Venha fazer parte da Família de Colaboradores da UPA. Profissionais que doam seu tempo em prol da causa dos animais - a nossa causa! Quer ser um patrocinador? Seu lugar é aqui, junte-se à nós!" />
@@ -76,7 +76,7 @@ const { sponsors, description } = Astro.props;
     min-width: 400px;
     color: var(--color-back);
 
-    h1 {
+    h2 {
       color: var(--color-back);
     }
 

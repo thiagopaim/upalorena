@@ -1,12 +1,17 @@
 # UPA Lorena — raiz do public_html
 #
 # Instalação (uma vez, manual via FTP/cPanel):
-#   Envie este arquivo para:
-#     public_html/.htaccess
-#   (renomeie para .htaccess se o cliente FTP esconder o ponto)
+#   1. Envie este arquivo para:
+#        public_html/.htaccess
+#      (renomeie para .htaccess se o cliente FTP esconder o ponto)
+#   2. Envie hosting/wp-content-uploads.htaccess para:
+#        public_html/wp/wp-content/uploads/.htaccess
+#      (cache longo das mídias do WordPress — hero, logos de parceiros, etc.)
 #
 # NÃO coloque este arquivo dentro de public_html/website/
 # O deploy do Astro vai só para website/; este arquivo fica na raiz.
+# O site Astro também leva public/.htaccess → website/.htaccess (cache de
+# /_astro e /images) automaticamente a cada build.
 #
 # Efeito:
 #   www → apex (301)
@@ -14,6 +19,11 @@
 #   upalorena.com.br/pagina/ → website/pagina/
 #   upalorena.com.br/wp/     → WordPress (intacto)
 #   HSTS + cache de assets estáticos
+#
+# Validação pós-deploy (deve aparecer Cache-Control: max-age=31536000):
+#   curl -sI https://upalorena.com.br/images/logo-upa-lorena.png
+#   curl -sI https://upalorena.com.br/wp/wp-content/uploads/2018/04/herob.jpg
+#   curl -sI "https://upalorena.com.br/_astro/" # pegue um .woff2 do HTML
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -45,7 +55,9 @@
   </If>
 </IfModule>
 
-# Cache de assets estáticos (CSS, JS, imagens, fontes, SVG)
+# Cache de assets estáticos na raiz / fallback (CSS, JS, imagens, fontes, SVG).
+# Uploads do WP: ver hosting/wp-content-uploads.htaccess
+# Assets do Astro: ver public/.htaccess → website/.htaccess
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresByType text/css "access plus 1 year"

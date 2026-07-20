@@ -3,7 +3,6 @@ import "@fontsource/amatic-sc/latin-400.css";
 import "@fontsource/amatic-sc/latin-700.css";
 import amatic400 from "@fontsource/amatic-sc/files/amatic-sc-latin-400-normal.woff2?url";
 import amatic700 from "@fontsource/amatic-sc/files/amatic-sc-latin-700-normal.woff2?url";
-import josefinLatin from "@fontsource-variable/josefin-sans/files/josefin-sans-latin-wght-normal.woff2?url";
 import Header from "../components/header.astro";
 import Donation from "../components/donation.astro";
 import Volunteer from "../components/volunteer.astro";
@@ -15,12 +14,14 @@ export interface Props {
   title: string;
   description?: string;
   image?: string;
+  /** URL da imagem LCP (ex.: primeiro slide do carrossel) para preload */
+  lcpImage?: string;
 }
 
 const DEFAULT_DESCRIPTION =
   "A União Protetora dos Animais de Lorena é uma organização sem fins lucrativos com propósito de acolher, tratar e encaminhar para adoção os animais abandonados.";
 
-const { title, description = DEFAULT_DESCRIPTION, image } = Astro.props;
+const { title, description = DEFAULT_DESCRIPTION, image, lcpImage } = Astro.props;
 
 const siteOrigin = Astro.site?.origin ?? "https://upalorena.com.br";
 const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? siteOrigin);
@@ -134,13 +135,14 @@ try {
       type="font/woff2"
       crossorigin
     />
-    <link
-      rel="preload"
-      href={josefinLatin}
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    {lcpImage && (
+      <link
+        rel="preload"
+        as="image"
+        href={lcpImage}
+        fetchpriority="high"
+      />
+    )}
   </head>
   <body>
     <Header />

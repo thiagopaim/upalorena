@@ -55,19 +55,34 @@ const excerptText = page?.excerpt?.rendered
   : ""
 const description = excerptText || undefined
 const ogImage = slides[0]?.slider_image?.url || undefined
+const lcpImage = slides[0]?.slider_image?.url || undefined
 ---
 
 <Layout
   title={page ? `${page.title.rendered} | UPA - União Protetora dos Animais` : "Home | UPA - União Protetora dos Animais"}
   description={description}
   image={ogImage}
+  lcpImage={lcpImage}
 >
+  <h1 class="visually-hidden">UPA - União Protetora dos Animais de Lorena</h1>
   {slides.length > 0 && (
     <Carousel slides={slides} interval={5000} />
   )}
 </Layout>
 
 <style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   /* Ajuste para que o carrossel ocupe a largura total, saindo do container se necessário,
      mas como está fora do Container, já deve ocupar 100% da largura do Layout/Main.
      Verificar se o Layout/Main tem restrições. */

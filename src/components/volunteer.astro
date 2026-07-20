@@ -11,7 +11,7 @@ const { content } = Astro.props;
 <section>
   <Container>
     <div class="column">
-      <h1>É um voluntáro vindo ali?</h1>
+      <h2>É um voluntário vindo ali?</h2>
       {content && <div set:html={content} />}
       <div class="contact">
         <h3>
@@ -22,7 +22,15 @@ const { content } = Astro.props;
       </div>
     </div>
   </Container>
-  <img class="image" src="/images/dog-watching.jpg" />
+  <img
+    class="image"
+    src="/images/dog-watching.jpg"
+    alt="Cachorro observando pela janela"
+    width="611"
+    height="407"
+    loading="lazy"
+    decoding="async"
+  />
 </section>
 
 <style>

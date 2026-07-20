@@ -14,27 +14,34 @@ interface Props {
 
 const { donations } = Astro.props;
 
-const displayDonations = donations && donations.length > 0 ? donations : [
+function toHttps(url: string): string {
+  return url.replace(/^http:\/\//i, "https://");
+}
+
+const displayDonations = (donations && donations.length > 0 ? donations : [
   {
     upa_donation_item: '10',
     upa_donation_application: 'Com este valor você ajuda a dar banho em um cachorro',
-    upa_donation_address: 'http://pag.ae/blyZBJD'
+    upa_donation_address: 'https://pag.ae/blyZBJD'
   },
   {
     upa_donation_item: '25',
     upa_donation_application: 'Com este valor você ajuda a com a ração diária',
-    upa_donation_address: 'http://pag.ae/bgw94c6'
+    upa_donation_address: 'https://pag.ae/bgw94c6'
   },
   {
     upa_donation_item: '50',
     upa_donation_application: 'Com este valor você ajuda a com a ração semanal',
-    upa_donation_address: 'http://pag.ae/bgw93dJ'
+    upa_donation_address: 'https://pag.ae/bgw93dJ'
   },
-]
+]).map((item) => ({
+  ...item,
+  upa_donation_address: toHttps(item.upa_donation_address),
+}));
 ---
 
 <Container>
-  <h1>Faça uma doação</h1>
+  <h2>Faça uma doação</h2>
   <p>Ou saiba mais sobre outras formas de fazer uma doação. Clique aqui!</p>
 </Container>
 <section>
@@ -42,22 +49,30 @@ const displayDonations = donations && donations.length > 0 ? donations : [
     {
       displayDonations.map((item) => (
         <div class="column">
-          <h2 class="price">
+          <p class="price">
             <span class="coin">R$</span>
             {item.upa_donation_item}
-            <div class="fraction">,00</div>
-          </h2>
+            <span class="fraction">,00</span>
+          </p>
           <p class="description">{item.upa_donation_application}</p>
           <a class="link" href={item.upa_donation_address} target="_blank" rel="noopener noreferrer">Doar valor</a>
         </div>
       ))
     }
     <div class="column">
-      <h2 class="price">
+      <p class="price">
         <span class="coin">R$</span>
-        <input class="customPrice" type="number" pattern="[0-9]*">
-        <div class="fraction">,00</div>
-      </h2>
+        <label class="visually-hidden" for="custom-donation-price">Valor personalizado da doação</label>
+        <input
+          id="custom-donation-price"
+          class="customPrice"
+          type="number"
+          pattern="[0-9]*"
+          inputmode="numeric"
+          min="1"
+        />
+        <span class="fraction">,00</span>
+      </p>
       <p class="description">Digite e faça uma doação no valor que desejar</p>
       <a class="link" href="" target="_blank" rel="noopener noreferrer">Doar valor</a>
     </div>
@@ -103,14 +118,28 @@ const displayDonations = donations && donations.length > 0 ? donations : [
     }
   }
 
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .coin {
     margin: 0px 5px 0px 0px;
     font-size: 1rem;
+    color: var(--color-back);
   }
 
   .fraction {
     margin: 0px 0px 0px 5px;
     font-size: 1rem;
+    color: var(--color-back);
   }
 
   .description {
@@ -118,8 +147,7 @@ const displayDonations = donations && donations.length > 0 ? donations : [
     margin: 0px auto 30px;
     font-size: 0.875rem;
     text-align: center;
-    opacity: 0.6;
-    color: var(--color-back);
+    color: #e8f4fc;
   }
 
   .link {

@@ -56,18 +56,6 @@ const hasSlides = slides && slides.length > 0
                   {slide.slider_link && (
                     <a href={slide.slider_link} class="btn">Saiba mais</a>
                   )}
-
-                  <div class="carousel-indicators">
-                    {slides.map((_, indicatorIndex) => (
-                      <button
-                        type="button"
-                        data-slide-to={indicatorIndex}
-                        class={indicatorIndex === slideIndex ? "active" : ""}
-                        aria-current={indicatorIndex === slideIndex ? "true" : "false"}
-                        aria-label={`Ir para o slide ${indicatorIndex + 1}`}
-                      />
-                    ))}
-                  </div>
                 </div>
               </Container>
             </div>
@@ -75,20 +63,19 @@ const hasSlides = slides && slides.length > 0
         ))}
       </div>
 
-      {/* {slides.length > 1 && (
-        <>
-          <button class="carousel-control prev" aria-label="Slide anterior">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-          <button class="carousel-control next" aria-label="Próximo slide">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </>
-      )} */}
+      {slides.length > 1 && (
+        <div class="carousel-indicators" role="tablist" aria-label="Slides">
+          {slides.map((_, indicatorIndex) => (
+            <button
+              type="button"
+              data-slide-to={indicatorIndex}
+              class={indicatorIndex === 0 ? "active" : ""}
+              aria-current={indicatorIndex === 0 ? "true" : "false"}
+              aria-label={`Ir para o slide ${indicatorIndex + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
@@ -119,11 +106,13 @@ const hasSlides = slides && slides.length > 0
     align-items: end;
     justify-content: center;
     width: 100%;
+    pointer-events: none;
   }
 
   .carousel-item.active {
     opacity: 1;
     z-index: 2;
+    pointer-events: auto;
   }
 
   .carousel-image {
@@ -155,8 +144,8 @@ const hasSlides = slides && slides.length > 0
     position: relative;
     z-index: 3;
     width: 100%;
-    padding: 30px 0;
-    pointer-events: none; /* Permite clicar através da caption se necessário, mas o botão tem pointer-events: auto */
+    padding: 30px 0 80px;
+    pointer-events: none;
   }
 
   .caption-content {
@@ -205,27 +194,47 @@ const hasSlides = slides && slides.length > 0
   .prev { left: 20px; }
   .next { right: 20px; }
 
-  /* Indicators */
+  /* Indicators — fora dos slides (evita foco em aria-hidden) */
   .carousel-indicators {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    z-index: 5;
     display: flex;
-    gap: 10px;
-    margin: 30px 0 0 0;
+    justify-content: center;
+    gap: 4px;
+    margin: 0;
+    pointer-events: auto;
   }
 
   .carousel-indicators button {
-    width: 12px;
-    height: 12px;
+    position: relative;
+    width: 44px;
+    height: 44px;
     padding: 0;
-    border-radius: 50%;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
-    background: var(--color-back);
-    border: 1px solid var(--color-prim);
+    background: transparent;
   }
 
-  .carousel-indicators button.active {
+  .carousel-indicators button::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--color-prim);
+    background: var(--color-back);
+    transform: translate(-50%, -50%);
+  }
+
+  .carousel-indicators button.active::after {
     background: var(--color-prim);
-    transform: scale(1.2);
+    transform: translate(-50%, -50%) scale(1.2);
   }
 
   @media (max-width: 768px) {
@@ -255,6 +264,7 @@ const hasSlides = slides && slides.length > 0
   class Carousel {
     element: HTMLElement;
     items: NodeListOf<Element>;
+    indicators: NodeListOf<HTMLElement>;
     prevBtn: HTMLElement | null;
     nextBtn: HTMLElement | null;
     intervalTime: number;
@@ -265,6 +275,7 @@ const hasSlides = slides && slides.length > 0
     constructor(element: HTMLElement) {
       this.element = element;
       this.items = element.querySelectorAll('.carousel-item');
+      this.indicators = element.querySelectorAll('.carousel-indicators button');
       this.prevBtn = element.querySelector('.prev');
       this.nextBtn = element.querySelector('.next');
       this.intervalTime = Number(element.dataset.interval) || 5000;
@@ -280,6 +291,14 @@ const hasSlides = slides && slides.length > 0
 
       this.startAutoplay();
       this.addEventListeners();
+    }
+
+    updateIndicators(index: number) {
+      this.indicators.forEach((indicator, i) => {
+        const isActive = i === index;
+        indicator.classList.toggle('active', isActive);
+        indicator.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
     }
 
     showSlide(index: number) {
@@ -298,6 +317,7 @@ const hasSlides = slides && slides.length > 0
 
       this.items[this.currentIndex].classList.add('active');
       this.items[this.currentIndex].setAttribute('aria-hidden', 'false');
+      this.updateIndicators(this.currentIndex);
     }
 
     next() {
@@ -338,12 +358,8 @@ const hasSlides = slides && slides.length > 0
         this.stopAutoplay();
       });
 
-      // Indicators click handling
-      // Select all indicators inside the carousel
-      const allIndicators = this.element.querySelectorAll('.carousel-indicators button');
-      allIndicators.forEach((indicator) => {
+      this.indicators.forEach((indicator) => {
         indicator.addEventListener('click', (e) => {
-          // Type assertion for HTMLElement to access dataset
           const target = e.currentTarget as HTMLElement;
           const targetIndex = Number(target.dataset.slideTo);
           if (!isNaN(targetIndex)) {
